@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="439.0" prefWidth="643.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="addressbook.addressbookfx.AddressBook">
+   <children>
+      <CheckBox fx:id="lastnameCheckBox" layoutX="372.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#onMouseClickedLastname" text="Lastname" />
+      <MenuBar layoutX="7.0" layoutY="1.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem fx:id="onClickLoadAddressBookTable" mnemonicParsing="false" onAction="#onClickLoadButton" text="Load File" />
+                  <MenuItem fx:id="addNewAddress" mnemonicParsing="false" onAction="#onClickAddNeAddress" text="Add new address" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <TableView fx:id="addressBookTable" layoutX="22.0" layoutY="88.0" prefHeight="200.0" prefWidth="600.0">
+        <columns>
+          <TableColumn fx:id="addressBookTableLastname" prefWidth="200.0" text="Lastname" />
+          <TableColumn fx:id="addressBookTableFirstname" prefWidth="200.0" text="Firstname" />
+            <TableColumn fx:id="addressBookTableAddress" prefWidth="200.0" text="Address" />
+        </columns>
+      </TableView>
+      <TextField fx:id="search" layoutX="22.0" layoutY="46.0" onAction="#onTextChanged" promptText="search" />
+      <CheckBox fx:id="firstnameCheckBox" layoutX="465.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#onMouseClickedFirstname" text="Fistname" />
+      <CheckBox fx:id="addressCheckBox" layoutX="557.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#onMouseClickedAddress" text="Address" />
+      <Label layoutX="293.0" layoutY="50.0" text="Search by :" />
+   </children>
+</Pane>
