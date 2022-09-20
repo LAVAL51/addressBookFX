@@ -1,5 +1,7 @@
 package addressbook.addressbookfx;
 
+import javafx.scene.control.Button;
+
 import java.util.Scanner;
 
 public class Address {
@@ -7,6 +9,7 @@ public class Address {
     private String lastname;
     private  String firstname;
     private String address;
+    private Button delete;
     private final Scanner SCANNER = new Scanner(System.in);
 
     //Constructors
@@ -15,12 +18,14 @@ public class Address {
         this.lastname = "";
         this.firstname = "";
         this.address = "";
+        this.delete = new Button("Delete");
     }
 
-    public Address(String lastname, String firstname, String address) {
+    public Address(String lastname, String firstname, String address, Button delete) {
         this.lastname = lastname;
         this.firstname = firstname;
         this.address = address;
+        this.delete = delete;
     }
 
     // methods
@@ -54,6 +59,8 @@ public class Address {
     public String getAddress() {
         return address;
     }
+
+    public Button getDelete() { return delete; }
 
     // Setters
 

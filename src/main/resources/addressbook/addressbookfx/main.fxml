@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane fx:id="content" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="509.0" prefWidth="785.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="addressbook.addressbookfx.AddressBook">
+    <children>
+      <MenuBar layoutX="7.0" layoutY="1.0">
+        <menus>
+          <Menu fx:id="fileMenu" mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem fx:id="homeMenu" mnemonicParsing="false" onAction="#ChangeToHomePage" text="Home" />
+                  <MenuItem fx:id="loadAddressBookTable" mnemonicParsing="false" onAction="#onClickLoadButton" text="Load File" />
+            </items>
+          </Menu>
+          <Menu fx:id="addressBookMenu" mnemonicParsing="false" text="AddressBook">
+               <items>
+                  <MenuItem fx:id="showAddresses" mnemonicParsing="false" onAction="#changeToShowAddressBook" text="AddressBook" />
+                  <MenuItem fx:id="addNewAddress" mnemonicParsing="false" onAction="#changeToAddAddressBook" text="Add new address" />
+               </items></Menu>
+        </menus>
+      </MenuBar>
+      <Pane fx:id="homePage" layoutX="18.0" layoutY="41.0" prefHeight="427.0" prefWidth="749.0" visible="false">
+         <children>
+            <Label layoutX="149.0" layoutY="26.0" text="Welcom to your address book">
+               <font>
+                  <Font size="34.0" />
+               </font>
+            </Label>
+            <Label fx:id="errorLastname1" alignment="CENTER" layoutX="299.0" layoutY="158.0" text="Lastname is required" textFill="RED" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="errorFirstname1" alignment="CENTER" layoutX="299.0" layoutY="231.0" text="Firstname is required" textFill="RED" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="errorAddress1" alignment="CENTER" layoutX="299.0" layoutY="297.0" text="Address is required" textFill="#d70505" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="newAddressRedistered1" layoutX="270.0" layoutY="314.0" text="new address well registered" textFill="#40cf39" visible="false">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Text layoutX="149.0" layoutY="138.0" strokeType="OUTSIDE" strokeWidth="0.0" text="This address book was created by Anthony LAVAL. You can use this to register your contact." wrappingWidth="451.3466796875" />
+         </children>
+      </Pane>
+        <Pane fx:id="AddressBook" layoutX="14.0" layoutY="52.0" prefHeight="377.0" prefWidth="749.0" visible="false">
+            <CheckBox fx:id="lastnameCheckBox" layoutX="108.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#onMouseClickedLastname" text="Lastname" />
+            <TableView fx:id="addressBookTable" layoutX="41.0" layoutY="93.0" prefHeight="318.0" prefWidth="675.0">
+                <columns>
+                    <TableColumn fx:id="addressBookTableLastname" prefWidth="200.0" sortable="false" text="Lastname" />
+                    <TableColumn fx:id="addressBookTableFirstname" prefWidth="200.0" sortable="false" text="Firstname" />
+                    <TableColumn fx:id="addressBookTableAddress" prefWidth="200.0" sortable="false" text="Address" />
+                    <TableColumn fx:id="deleteButton" prefWidth="75.0" sortable="false" text="Delete" />
+                </columns>
+            </TableView>
+            <TextField fx:id="search" layoutX="567.0" layoutY="46.0" onAction="#onTextChanged" promptText="search" />
+            <CheckBox fx:id="firstnameCheckBox" layoutX="189.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#onMouseClickedFirstname" text="Fistname" />
+            <CheckBox fx:id="addressCheckBox" layoutX="265.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#onMouseClickedAddress" text="Address" />
+            <Label layoutX="41.0" layoutY="50.0" text="Search by :" />
+        </Pane>
+      <Pane fx:id="AddAddressBook" layoutX="14.0" layoutY="66.0" prefHeight="427.0" prefWidth="749.0">
+         <children>
+            <Label layoutX="246.0" layoutY="14.0" text="Add new address">
+               <font>
+                  <Font size="34.0" />
+               </font>
+            </Label>
+            <TextField fx:id="newLastname" layoutX="299.0" layoutY="132.0" promptText="Lastname" />
+            <TextField fx:id="newFirstname" layoutX="299.0" layoutY="205.0" promptText="Firstname" />
+            <TextField fx:id="newAddress" layoutX="299.0" layoutY="271.0" promptText="Address" />
+            <Button fx:id="sendNewAddress" layoutX="348.0" layoutY="347.0" mnemonicParsing="false" onAction="#onClickAddNeAddress" text="Send" />
+            <Label fx:id="requiredFields" layoutX="299.0" layoutY="92.0" text="Required fields : *" textFill="RED">
+               <font>
+                  <Font size="11.0" />
+               </font>
+            </Label>
+            <Label fx:id="requiredStar" layoutX="446.0" layoutY="122.0" text="*" textFill="RED">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Label fx:id="requiredstar" layoutX="447.0" layoutY="195.0" prefHeight="18.0" prefWidth="6.0" text="*" textFill="RED">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Label fx:id="requiredstar" layoutX="446.0" layoutY="262.0" text="*" textFill="RED">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Label fx:id="errorLastname" alignment="CENTER" layoutX="299.0" layoutY="158.0" text="Lastname is required" textFill="RED" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="errorFirstname" alignment="CENTER" layoutX="299.0" layoutY="231.0" text="Firstname is required" textFill="RED" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="errorAddress" alignment="CENTER" layoutX="299.0" layoutY="297.0" text="Address is required" textFill="#d70505" visible="false">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Label fx:id="newAddressRegistered" layoutX="270.0" layoutY="314.0" text="new address well registered" textFill="#40cf39" visible="false">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+   </children>
+</Pane>

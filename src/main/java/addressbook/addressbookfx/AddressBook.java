@@ -6,60 +6,113 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
-import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
 public class AddressBook implements Initializable {
 
+    // Statement of variables that I will use
+
     private final Scanner SCANNER = new Scanner(System.in);
     private Address[] addressBook = new Address[10];
     private Address[] addressBookSearch = new Address[10];
-    private final ObservableList<Address> addresses = FXCollections.observableArrayList();
+    public final ObservableList<Address> addresses = FXCollections.observableArrayList();
+    private boolean isSearch = false;
+
+    // For method search
+    private boolean isCheckedLastname = false;
+    private boolean isCheckedFirstname = false;
+    private boolean isCheckedAddress = false;
+
+
+    // Statement of FXML variables that I will use
+
+    // Menu
+    @FXML
+    private Menu fileMenu;
+    @FXML
+    private MenuItem homeMenu;
+    @FXML
+    private MenuItem loadAddressBookTable;
+    @FXML
+    private Menu addressBookMenu;
+    @FXML
+    private MenuItem showAddresses;
+    @FXML
+    private MenuItem addNewAddress;
+
+    // Panes
+    @FXML
+    private Pane content;
+    @FXML
+    private Pane homePage;
+    @FXML
+    private Pane AddressBook;
+    @FXML
+    private Pane AddAddressBook;
+
+    // Variables for method initialize
+    @FXML
+    private TableView<Address> addressBookTable = new TableView<Address>();
+    @FXML
+    private TableColumn<Address, String> addressBookTableFirstname = new TableColumn<Address, String>();
+    @FXML
+    private TableColumn<Address, String> addressBookTableLastname = new TableColumn<Address, String>();
+    @FXML
+    private TableColumn<Address, String> addressBookTableAddress = new TableColumn<Address, String>();
+    @FXML
+    private TableColumn<Address, Button> deleteButton = new TableColumn<Address, Button>();
+
+
+    // For method add new address
+    @FXML
+    private Button sendNewAddress;
+    @FXML
+    private TextField newLastname;
+    @FXML
+    private TextField newFirstname;
+    @FXML
+    private TextField newAddress;
+    @FXML
+    private Label errorLastname;
+    @FXML
+    private Label errorFirstname;
+    @FXML
+    private Label errorAddress;
+    @FXML
+    private Label requiredFields;
+    @FXML
+    private Label requiredStar;
+    @FXML
+    private Label newAddressRegistered;
+
+    // For method search
+    @FXML
+    private TextField search;
+
+    //
+    // We use the default constructor that is a fact I don't declared constructor.
+    //
+
+    // Methods
 
     public void addNewAddressWithSettings(Address[] addressList, String firstname, String lastname, String address) {
         for (int i = 0; i < addressList.length; i++) {
             if (addressList[i] == null) {
-                addressList[i] = new Address(firstname, lastname, address);
+                addressList[i] = new Address(firstname, lastname, address, new Button("Delete"));
                 break;
             }
         }
-    }
-
-    public void searchAddressByKeyWords(Address[] addressList) {
-        System.out.println("Please enter your search (you can search by firstname, lastname or address) ");
-        String personSearch = SCANNER.nextLine();
-        String[] mySearch = personSearch.split(" ");
-        boolean result = false;
-
-        for (Address value : addressList) {
-            if (value != null) {
-                String lastname = value.getLastname();
-                String firstname = value.getFirstname();
-                String address = value.getAddress();
-                for (String search : mySearch) {
-                    if (firstname.equals(search) || lastname.equals(search) || address.equals(search)) {
-                        addressBook = new Address[10];
-                        result = true;
-                    }
-                }
-            }
-        }
-        isResult(result);
     }
 
     public void searchAddressByCriteria(Address[] addressList, String search, String criteria) {
@@ -109,6 +162,7 @@ public class AddressBook implements Initializable {
                             addNewAddressWithSettings(addressBookSearch, address.getLastname(), address.getFirstname(), address.getAddress());
                             initialize(null, null);
                             result = true;
+                            break;
                         }
                     }
                 }
@@ -121,12 +175,6 @@ public class AddressBook implements Initializable {
 
     private boolean isValidAddressComparedSearch(Address address, String search) {
         return search.equals(address.getAddress()) || search.equals(address.getLastname()) || search.equals(address.getFirstname());
-    }
-
-    private void isResult(Boolean result) {
-        if (!result) {
-            initialize(null, null);
-        }
     }
 
     private int countNbNullInArray(Address[] addressList) {
@@ -238,8 +286,45 @@ public class AddressBook implements Initializable {
         }
     }
 
+    private void setAddresses(Address[] addressesBook) {
+        for (Address address : addressesBook) {
+            if (address != null) {
+                addresses.add(new Address(address.getLastname(), address.getFirstname(), address.getAddress(), new Button("Delete")));
+            }
+        }
+    }
+
+    public void initialize(URL location, ResourceBundle resource) {
+        addressBookTableLastname.setCellValueFactory(new PropertyValueFactory<>("Lastname"));
+        addressBookTableFirstname.setCellValueFactory(new PropertyValueFactory<>("Firstname"));
+        addressBookTableAddress.setCellValueFactory(new PropertyValueFactory<>("Address"));
+        deleteButton.setCellValueFactory(new PropertyValueFactory<>("Delete"));
+
+        if(this.isSearch) {
+            for (Address address : addressBookSearch) {
+                if (address != null) {
+                    setAddresses(addressBookSearch);
+                    break;
+                }
+            }
+            this.isSearch = false;
+        }  else {
+            setAddresses(addressBook);
+        }
+
+        addressBookTable.setItems(addresses);
+    }
+
+    private void changePane(){
+        if (AddressBook.isVisible()) AddressBook.setVisible(false);
+        if (AddAddressBook.isVisible()) AddAddressBook.setVisible(false);
+        if (homePage.isVisible()) homePage.setVisible(false);
+    }
+
+    // FXML Methods
+
     @FXML
-    public void onClickLoadButton(ActionEvent event) throws Exception {
+    public void onClickLoadButton() throws Exception {
         FileChooser fileChooser = new FileChooser();
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
@@ -255,101 +340,12 @@ public class AddressBook implements Initializable {
     }
 
     @FXML
-    private TableView<Address> addressBookTable;
-
-    @FXML
-    private TableColumn<Address, String> addressBookTableFirstname;
-
-    @FXML
-    private TableColumn<Address, String> addressBookTableLastname;
-
-    @FXML
-    private TableColumn<Address, String> addressBookTableAddress;
-
-    public void initialize(URL location, ResourceBundle resource) {
-        addressBookTableLastname.setCellValueFactory(new PropertyValueFactory<>("Lastname"));
-        addressBookTableFirstname.setCellValueFactory(new PropertyValueFactory<>("Firstname"));
-        addressBookTableAddress.setCellValueFactory(new PropertyValueFactory<>("Address"));
-
-        boolean isEmptySearch = true;
-
-        for (Address address : addressBookSearch) {
-            addresses.clear();
-            if (address != null) {
-                setAddresses(addressBookSearch);
-                isEmptySearch = false;
-                break;
-            }
-        }
-
-        if(isEmptySearch) {
-            setAddresses(addressBook);
-        }
-
-        addressBookTable.setItems(addresses);
-    }
-
-    private void setAddresses(Address[] addressesBook) {
-        for (Address address : addressesBook) {
-            if (address != null) {
-                addresses.add(new Address(address.getLastname(), address.getFirstname(), address.getAddress()));
-            }
-        }
-    }
-
-    @FXML
     public void onClickAddNeAddress(){
-
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(10, 10, 10, 10));
-        gridPane.setVgap(5);
-        gridPane.setHgap(5);
-
-        Label title = new Label("Add new address");
-        GridPane.setConstraints(title, 50, 0);
-        gridPane.getChildren().add(title);
-
-        Label errorLastname = new Label();
-        GridPane.setConstraints(errorLastname, 50, 1);
-        gridPane.getChildren().add(errorLastname);
-        errorLastname.setVisible(false);
-
-        TextField newLastname = new TextField();
-        newLastname.setPromptText("Enter lastname");
-        GridPane.setConstraints(newLastname, 50, 2);
-        gridPane.getChildren().add(newLastname);
-
-        Label errorFirstname = new Label();
-        GridPane.setConstraints(errorFirstname, 50, 3);
-        gridPane.getChildren().add(errorFirstname);
-        errorFirstname.setVisible(false);
-
-        TextField newFirstname = new TextField();
-        newFirstname.setPromptText("Enter firstname");
-        GridPane.setConstraints(newFirstname, 50, 4);
-        gridPane.getChildren().add(newFirstname);
-
-        Label errorAddress = new Label();
-        GridPane.setConstraints(errorAddress, 50, 5);
-        gridPane.getChildren().add(errorAddress);
-        errorAddress.setVisible(false);
-
-        TextField newAddress = new TextField();
-        newAddress.setPromptText("Enter address");
-        GridPane.setConstraints(newAddress, 50, 6);
-        gridPane.getChildren().add(newAddress);
-
-        Button sendNewAddress = new Button("Send");
-        GridPane.setConstraints(sendNewAddress, 50, 10);
-        gridPane.getChildren().add(sendNewAddress);
-
-        Scene scene = new Scene(gridPane, 643, 439);
-
-        Stage newWindow = new Stage();
 
         sendNewAddress.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
+                newAddressRegistered.setVisible(false);
                 boolean verifLastname = true;
                 boolean verifFirstname = true;
                 boolean verifAddress = true;
@@ -387,22 +383,14 @@ public class AddressBook implements Initializable {
                 if (verifLastname && verifFirstname && verifAddress) {
                     addNewAddressWithSettings(addressBook, newLastname.getText(), newFirstname.getText(), newAddress.getText());
                     initialize(null, null);
-                    newWindow.close();
+                    newAddressRegistered.setVisible(true);
+                    newLastname.setText("");
+                    newFirstname.setText("");
+                    newAddress.setText("");
                 }
             }
         });
-
-        newWindow.setTitle("Add new address");
-        newWindow.setScene(scene);
-        newWindow.show();
     }
-
-    @FXML
-    private TextField search;
-
-    private boolean isCheckedLastname = false;
-    private boolean isCheckedFirstname = false;
-    private boolean isCheckedAddress = false;
 
     @FXML
     public void onMouseClickedLastname() {
@@ -422,14 +410,36 @@ public class AddressBook implements Initializable {
     @FXML
     public void onTextChanged() {
         String criteria = "";
+        addressBookSearch = new Address[10];
 
         if (this.isCheckedFirstname) criteria += "1";
         if (this.isCheckedLastname) criteria += "2";
         if (this.isCheckedAddress) criteria += "3";
 
+        addresses.clear();
+
         if (!criteria.equals("")) {
-            addressBookSearch = new Address[10];
+            this.isSearch = true;
             searchAddressByCriteria(addressBook, search.getText(), criteria);
+        } else {
+            initialize(null, null);
         }
+    }
+
+    @FXML
+    public void changeToShowAddressBook(ActionEvent event) {
+        this.changePane();
+        AddressBook.setVisible(true);
+    }
+
+    public void changeToAddAddressBook(ActionEvent event) {
+        this.changePane();
+        AddAddressBook.setVisible(true);
+    }
+
+    @FXML
+    public void ChangeToHomePage(ActionEvent event) {
+        this.changePane();
+        homePage.setVisible(true);
     }
 }
