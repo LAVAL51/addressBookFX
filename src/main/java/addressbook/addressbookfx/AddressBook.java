@@ -1,8 +1,8 @@
 package addressbook.addressbookfx;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,12 +12,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+
+import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class AddressBook implements Initializable {
 
@@ -41,25 +42,17 @@ public class AddressBook implements Initializable {
     @FXML
     private Menu fileMenu;
     @FXML
-    private MenuItem homeMenu;
-    @FXML
     private MenuItem loadAddressBookTable;
-    @FXML
-    private Menu addressBookMenu;
-    @FXML
-    private MenuItem showAddresses;
-    @FXML
-    private MenuItem addNewAddress;
 
     // Panes
     @FXML
     private Pane content;
     @FXML
-    private Pane homePage;
+    private Pane validSavePane;
     @FXML
-    private Pane AddressBook;
+    private Pane cancelSavePane;
     @FXML
-    private Pane AddAddressBook;
+    private Pane validLaod;
 
     // Variables for method initialize
     @FXML
@@ -100,12 +93,19 @@ public class AddressBook implements Initializable {
     @FXML
     private TextField search;
 
+    // For save
+    @FXML
+    private MenuItem saveAddressBook;
+    @FXML
+    private  Label labelSave;
+
     //
     // We use the default constructor that is a fact I don't declared constructor.
     //
 
     // Methods
 
+    //Method to add new address
     public void addNewAddressWithSettings(Address[] addressList, String firstname, String lastname, String address) {
         for (int i = 0; i < addressList.length; i++) {
             if (addressList[i] == null) {
@@ -115,6 +115,7 @@ public class AddressBook implements Initializable {
         }
     }
 
+    // Method to search one or various addresses in addressBook
     public void searchAddressByCriteria(Address[] addressList, String search, String criteria) {
 
         String [] myCriteria = criteria.replace(" ", "").split("");
@@ -173,10 +174,12 @@ public class AddressBook implements Initializable {
         }
     }
 
+    // Method to check if search equals value
     private boolean isValidAddressComparedSearch(Address address, String search) {
         return search.equals(address.getAddress()) || search.equals(address.getLastname()) || search.equals(address.getFirstname());
     }
 
+    //Method to count number of case "empty" in address's array
     private int countNbNullInArray(Address[] addressList) {
         int nbNull = 0;
         for (Address address : addressList) {
@@ -185,25 +188,47 @@ public class AddressBook implements Initializable {
         return nbNull;
     }
 
-    public void sortAddressByOneCriteria(Address[] addressList) {
+    // Method to sort addresses array with one order and one criteria
+    public void sortAddressByOneCriteria(Address[] addressList, int choiceSpe, int orderSpe) {
 
-        System.out.println("You want to sort by \n 1. Firstname \n 2. Lastname \n 3. Address ");
-        int choiceSortCriteria = SCANNER.nextInt();
+        int choiceSortCriteria = choiceSpe;
+        if (choiceSpe == 0) {
+            System.out.println("You want to sort by \n 1. Firstname \n 2. Lastname \n 3. Address ");
+            choiceSortCriteria = SCANNER.nextInt();
+        }
 
-        System.out.println("You want to by \n 1. ascending order \n 2. descending order");
-        int sortChoice = SCANNER.nextInt();
+        int sortChoice = orderSpe;
+        if(orderSpe == 0) {
+            System.out.println("You want to by \n 1. ascending order \n 2. descending order");
+            sortChoice = SCANNER.nextInt();
+        }
+
 
         int numberOfElementToSort = addressList.length - this.countNbNullInArray(addressList);
         String[] criteria = new String[numberOfElementToSort];
+
+        boolean isFirstname = false;
+        boolean isLastname = false;
+        boolean isAddress = false;
 
         for (Address address : addressList) {
             for (int i = 0; i < criteria.length; i++) {
                 if (criteria[i] == null) {
                     switch (choiceSortCriteria) {
-                        case 1 -> criteria[i] = address.getFirstname();
-                        case 2 -> criteria[i] = address.getLastname();
-                        case 3 -> criteria[i] = address.getAddress();
-                        default -> System.out.println("Invalid input !!");
+                        case 1:
+                            criteria[i] = address.getFirstname();
+                            isFirstname = true;
+                            break;
+                        case 2:
+                            criteria[i] = address.getLastname();
+                            isLastname = true;
+                            break;
+                        case 3:
+                            criteria[i] = address.getAddress();
+                            isAddress = true;
+                            break;
+                        default:
+                            System.out.println("Invalid input !!");
                     }
                     break;
                 }
@@ -231,11 +256,23 @@ public class AddressBook implements Initializable {
                 }
             }
         }
-        System.out.println(
-                "The names in alphabetical order are: ");
+
+        Address[] tempo = new Address[addressList.length];
         for (int i = 0; i < numberOfElementToSort; i++) {
-            System.out.println(criteria[i]);
+            for (Address address : addressList) {
+                if ((isFirstname && address.getFirstname().equals(criteria[i])) || (isLastname && address.getLastname().equals(criteria[i])) || (isAddress && address.getAddress().equals(criteria[i]))) {
+                    for (int l = 0; l < tempo.length; l++){
+                        if (tempo[l] == null){
+                            tempo[l] = address;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
         }
+
+        System.arraycopy(tempo, 0, addressList, 0, addressList.length);
     }
 
     public void removeAddress(Address[] addressList) {
@@ -281,6 +318,7 @@ public class AddressBook implements Initializable {
                 String[] words = currentLine.split("\t");
                 this.addNewAddressWithSettings(addressList, words[0], words[1], words[2]);
             }
+            this.confirmSave(this.validLaod);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -291,6 +329,57 @@ public class AddressBook implements Initializable {
             if (address != null) {
                 addresses.add(new Address(address.getLastname(), address.getFirstname(), address.getAddress(), new Button("Delete")));
             }
+        }
+    }
+
+    public void saveFile(Address[] addressList) throws IOException {
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Choose a file location");
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+
+            File file = fileChooser.showSaveDialog(null);
+            if (file == null) {
+                this.confirmSave(this.cancelSavePane);
+            } else {
+                if (file.createNewFile()) {
+                    FileWriter fileWriter = new FileWriter(file);
+                    for (Address address : addressList) {
+                        if (address != null) {
+                            fileWriter.write(address.getLastname() + "\t" + address.getFirstname() + "\t" + address.getAddress() + "\n");
+                        }
+                    }
+                    fileWriter.close();
+                    this.confirmSave(this.validSavePane);
+                } else {
+                    this.confirmSave(this.cancelSavePane);
+                }
+            }
+        }
+        catch (IOException e) {
+            System.out.println("saveFile " + e);
+        }
+    }
+
+    public void confirmSave(Pane pane){
+        try {
+            pane.setVisible(true);
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            pane.setVisible(false);
+                        }
+                    });
+
+                }
+            }, 3000);
+        }
+        catch(Exception e) {
+            System.out.println("confirmSave : " + e);
         }
     }
 
@@ -313,12 +402,6 @@ public class AddressBook implements Initializable {
         }
 
         addressBookTable.setItems(addresses);
-    }
-
-    private void changePane(){
-        if (AddressBook.isVisible()) AddressBook.setVisible(false);
-        if (AddAddressBook.isVisible()) AddAddressBook.setVisible(false);
-        if (homePage.isVisible()) homePage.setVisible(false);
     }
 
     // FXML Methods
@@ -425,21 +508,8 @@ public class AddressBook implements Initializable {
             initialize(null, null);
         }
     }
-
     @FXML
-    public void changeToShowAddressBook(ActionEvent event) {
-        this.changePane();
-        AddressBook.setVisible(true);
-    }
-
-    public void changeToAddAddressBook(ActionEvent event) {
-        this.changePane();
-        AddAddressBook.setVisible(true);
-    }
-
-    @FXML
-    public void ChangeToHomePage(ActionEvent event) {
-        this.changePane();
-        homePage.setVisible(true);
+    public void onClickSaveAddressBook() throws IOException {
+        this.saveFile(addressBook);
     }
 }
